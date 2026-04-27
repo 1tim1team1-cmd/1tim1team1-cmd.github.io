@@ -1,0 +1,74 @@
+A) Cover‑driven theme (как у Apple, очень тонко)
+Цель
+Сделать так, чтобы активный альбом / активный трек / прогресс подкрашивались цветом текущей обложки, но деликатно (не “кислотно”).
+
+Что меняем
+Файл: src/pages/music.astro
+
+JS: когда обложка загрузилась и мы уже вычисляем цвет (через canvas), дополнительно выставляем CSS‑переменные на :root:
+--np-ac1 / --np-ac2 (акцентные цвета)
+--np-border (чуть более плотный цвет для бордера активного альбома)
+--np-fill (очень прозрачная заливка для playing‑трека)
+CSS: используем эти переменные:
+.album-item.active-album → бордер/тень от --np-border (тонко, +1px к визуалу как ты просил)
+.track-row.playing → background: var(--np-fill)
+.player-seek-fill → градиент от --np-ac1 → --np-ac2 (вместо постоянного --accent/--sky)
+опционально: wave-bars тоже чуть подкрашивать от --np-ac1 (очень аккуратно)
+Результат
+Одна обложка задаёт тон интерфейсу — это будет твоим “стилевым фундаментом” для других вкладок.
+
+B) Global Media Session (системный плеер / наушники / lock screen) + единая логика
+Цель
+Чтобы управление работало:
+
+кнопками на клавиатуре (“медиа клавиши”: next/prev/play-pause)
+кнопками на наушниках/телефоне
+отображались title/artist/cover в системном плеере
+Что меняем
+Файл: src/layouts/Layout.astro
+
+Добавляем единый global MediaSession менеджер, который:
+слушает событие nowplayingchange
+выставляет navigator.mediaSession.metadata
+ставит handlers:
+play, pause
+previoustrack, nexttrack
+seekbackward, seekforward (с offset)
+seekto (если браузер поддерживает)
+обновляет setPositionState на timeupdate/loadedmetadata, чтобы перемотка работала красиво
+Реализация next/prev будет глобальной:
+если на /music доступны musicNext/musicPrev → используем их
+иначе используем mpNext/mpPrev (миниплеер)
+Результат
+Это “премиум‑ощущение продукта” + основа для будущих вкладок.
+
+C) Global hotkeys (клавиатура) + перемотка ±5 сек
+Цель
+Удобство “как в нормальных плеерах”:
+
+Space → play/pause
+ArrowLeft / ArrowRight → перемотка −5 / +5 сек
+Shift + ArrowLeft/Right → перемотка −15 / +15 сек (опционально, но удобно)
+поддержка клавиш:
+MediaPlayPause
+MediaTrackNext
+MediaTrackPrevious
+Что меняем
+Файл: src/layouts/Layout.astro
+
+Добавляем один keydown listener (bind once), который:
+
+не срабатывает, если фокус в input/textarea/contenteditable
+работает на всех страницах, потому что аудио у тебя глобальное
+Файлы, которые точно тронем
+src/pages/music.astro — CSS + маленькое расширение функции цвета обложки (переменные на :root)
+src/layouts/Layout.astro — MediaSession + hotkeys + seek
+MiniPlayer.astro трогать не обязательно, но я рекомендую маленькую правку:
+
+чтобы nowPlaying всегда имел title/artist/albumFolder (у тебя уже есть), этого достаточно — MediaSession сможет строить cover по albumFolder.
+Как будем тестировать после внедрения (чеклист)
+Включаешь трек → активный альбом/трек/прогресс становятся слегка “в тон обложки”
+Нажимаешь Space → пауза/плей
+←/→ → перемотка на 5 секунд
+Медиаклавиши клавиатуры (если есть) → next/prev/playpause
+На Android/iOS/наушниках → системные кнопки работают, и обложка отображается

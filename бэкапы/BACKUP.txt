@@ -1,0 +1,106 @@
+BACKUP: фиксы вкладки /music (Astro)
+1) Главная причина сломанной вёрстки (/music)
+В src/pages/music.astro список альбомов и треков создаётся динамически через JS (innerHTML, document.createElement).
+
+Но CSS внутри .astro по умолчанию scoped (Astro добавляет спец‑атрибуты к элементам), поэтому стили применяются только к “родным” элементам, которые были в HTML при SSR.
+
+Динамически созданные элементы не получают scoped‑атрибут ⇒ стили не применяются, из-за чего:
+
+ломается сетка/аккордеон
+обложки (<img class="album-thumb">) начинают раздуваться и перекрывать страницу
+всё выглядит “хаотично”
+FIX
+Сделать стили на странице музыки глобальными.
+
+Было:
+
+HTML
+
+<style>
+Стало:
+
+HTML
+
+<style is:global>
+2) Дополнительная страховка от “огромных” обложек
+Ранее <img class="album-thumb"> имел position:absolute, но размер (width/height) приходил из CSS. Если CSS не применялся (из‑за scoped), <img> становился огромным.
+
+FIX
+В music.astro → функция buildAlbumEl() → thumbHTML задать размеры инлайном:
+
+JavaScript
+
+const coverSrc = `/covers/${encodeURIComponent(album.folder)}.jpg`;
+
+const thumbHTML = `
+  <div class="album-thumb-emoji">${album.emoji || '🎵'}</div>
+  <img
+    class="album-thumb"
+    style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px;"
+    src="${coverSrc}"
+    onerror="this.style.display='none';this.previousElementSibling.style.display='flex'"
+    onload="this.style.display='block';this.previousElementSibling.style.display='none'"
+  />
+`;
+(Контейнер под thumb уже есть: style="position:relative;...width:52px;height:52px" — это важно.)
+
+3) Почему некоторые треки не воспроизводились
+Часто не играет из-за:
+
+спецсимволов в имени файла (#, !, ,, скобки, пробелы, точки в начале типа 08.fkmg.mp3)
+двойных пробелов в именах
+папок с пробелами/запятыми (06Lost in sound, found in the stars, 12Dino game, 13Not relised)
+несоответствия имени в albums.json фактическому имени файла/папки в public/music/... (даёт 404)
+FIX (уже было/проверить)
+В music.astro при установке audio.src нужен URL-энкодинг сегментов пути (папка и файл):
+
+JavaScript
+
+const rawPath = `/music/${album.folder}/${track.file}`;
+const safePath = rawPath
+  .split('/')
+  .map((seg, i) => (i > 0 ? encodeURIComponent(seg) : seg))
+  .join('/');
+
+audio.src = safePath;
+Диагностика: DevTools → Network → фильтр mp3 → если 404, значит имя файла/папки не совпадает 1:1 с тем, что в albums.json.
+
+4) Контекст (что меняли ранее по Layout/Transitions, чтобы проект вообще запустился)
+(Не про музыку напрямую, но важно как “состояние проекта”.)
+
+Ошибка была:
+Unable to render ViewTransitions because it is undefined!
+
+FIX (совместимость между версиями Astro):
+В Layout.astro не использовать прямой import { ViewTransitions } from 'astro:transitions', потому что экспорт может отличаться.
+Использовать безопасный импорт и условный рендер:
+astro
+
+---
+import * as AstroTransitions from 'astro:transitions';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'timteam · portfolio',
+  description = '3D artist, musician and developer',
+} = Astro.props as Props;
+
+const ViewTransitions =
+  (AstroTransitions as any).ViewTransitions ?? (AstroTransitions as any).ClientRouter;
+
+const currentPath = Astro.url.pathname;
+---
+
+<head>
+  {ViewTransitions ? <ViewTransitions /> : null}
+</head>
+Итог
+Критичный фикс для /music: <style is:global>, потому что страница создаёт DOM динамически, а scoped CSS Astro не применяется к вставленному через JS HTML.
+
+Второй фикс: инлайн‑ограничение для <img> внутри thumb, чтобы даже при сбое CSS картинка не раздувала страницу.
+

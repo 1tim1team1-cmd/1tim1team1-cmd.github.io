@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const services = [
+  { icon: "🎨", title: "3D моделирование / рендеринг", desc: "Реалистичная 3D-модель или рендер под ваш проект. Персонажи, окружение, архитектура, продукт. Blender + профессиональная постобработка.", priceRub: 3000, priceUsd: 50, tag: "от" },
+  { icon: "🎬", title: "Монтаж / VFX / цветокоррекция", desc: "Монтаж видео любой сложности, визуальные эффекты в After Effects, LUT-цветокоррекция. Клипы, ролики, трейлеры.", priceRub: 3000, priceUsd: 50, tag: "от" },
+  { icon: "🎵", title: "Музыка / саундтрек", desc: "Авторское музыкальное произведение: оркестр, электроника, рок, поп — любой жанр. Живые инструменты, не шаблоны.", priceRub: 1800, priceUsd: 30, tag: "от" },
+  { icon: "💻", title: "Разработка сайта", desc: "Рабочий сайт-портфолио, лендинг или небольшой проект. Современный дизайн, адаптив, быстро.", priceRub: 1800, priceUsd: 30, tag: "от" },
+];
+---
+<Layout title="timteam · Услуги" description="Фриланс-услуги: 3D, монтаж, музыка, разработка">
+<div style="max-width:800px;margin:0 auto;padding:40px 24px 100px;text-align:center;">
+
+  <div class="anim-up"><span class="tag">Фриланс · заказать проект</span></div>
+  <h1 class="anim-up-2" style="font-size:clamp(32px,5vw,56px);font-weight:700;letter-spacing:-.02em;margin:16px 0 12px;">Услуги</h1>
+  <p class="anim-up-3" style="font-size:16px;color:var(--text-muted);line-height:1.7;max-width:480px;margin:0 auto 16px;">
+    Обсудим детали — финальная цена зависит от объёма и сложности.
+  </p>
+
+  <div class="anim-up-3" style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--glass-border-vis);border-radius:100px;padding:4px;margin-bottom:48px;">
+    <button id="btn-rub" onclick="setCurrency('rub')" style="border:none;cursor:pointer;padding:7px 20px;border-radius:100px;font-size:13px;font-weight:500;transition:background .25s,color .25s;background:var(--accent);color:#fff;">₽ Рубли</button>
+    <button id="btn-usd" onclick="setCurrency('usd')" style="border:none;cursor:pointer;padding:7px 20px;border-radius:100px;font-size:13px;font-weight:500;transition:background .25s,color .25s;background:transparent;color:var(--text-muted);">$ Доллары</button>
+  </div>
+
+  <div class="anim-up-4" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:48px;">
+    {services.map((s, i) => (
+      <div class="glass section-card" style={`text-align:left;transition-delay:${i*0.06}s;`}>
+        <div style="font-size:36px;margin-bottom:14px;">{s.icon}</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:8px;">{s.title}</div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:20px;">{s.desc}</p>
+        <div style="display:flex;align-items:baseline;gap:6px;">
+          <span style="font-size:11px;color:var(--text-hint);">{s.tag}</span>
+          <span class="price-rub" style="font-size:24px;font-weight:700;color:var(--accent);">{s.priceRub.toLocaleString('ru')} ₽</span>
+          <span class="price-usd" style="font-size:24px;font-weight:700;color:var(--accent);display:none;">${s.priceUsd}</span>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="glass anim-up-5" style="border-radius:28px;padding:36px 32px;text-align:center;">
+    <h2 style="font-size:22px;font-weight:700;margin-bottom:12px;">Обсудим проект?</h2>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:28px;max-width:400px;margin-left:auto;margin-right:auto;">Пиши — отвечу быстро, расскажу детали и подберём оптимальный вариант.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+      <a href="https://t.me/T1m_11" target="_blank" class="btn btn-primary">Telegram @T1m_11</a>
+      <a href="mailto:timteamfreelance@gmail.com" class="btn btn-glass">Email</a>
+    </div>
+    <div style="margin-top:24px;font-size:12px;color:var(--text-hint);">
+      или Discord: <strong>timteam0_0</strong>
+    </div>
+  </div>
+
+</div>
+
+<script is:inline>
+function setCurrency(cur) {
+  const isUsd = cur === 'usd';
+  document.querySelectorAll('.price-rub').forEach(el => el.style.display = isUsd ? 'none' : 'inline');
+  document.querySelectorAll('.price-usd').forEach(el => el.style.display = isUsd ? 'inline' : 'none');
+  document.getElementById('btn-rub').style.background = isUsd ? 'transparent' : 'var(--accent)';
+  document.getElementById('btn-rub').style.color = isUsd ? 'var(--text-muted)' : '#fff';
+  document.getElementById('btn-usd').style.background = isUsd ? 'var(--accent)' : 'transparent';
+  document.getElementById('btn-usd').style.color = isUsd ? '#fff' : 'var(--text-muted)';
+}
+</script>
+</Layout>

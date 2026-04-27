@@ -1,0 +1,103 @@
+Дорожная карта (текущая фаза /music → база для всего сайта)
+Уже сделано и стабильно
+Глобальный audio#main-audio с transition:persist (не сбрасывается при навигации).
+/music: аккордеон альбомов, плеер, подсветка playing-трека, sync с MiniPlayer через nowplayingchange.
+URL-safe пути для треков (encodeURIComponent сегментов), deep-link на трек (/music?folder=...&file=...), копирование/поделиться ссылкой.
+Orbs: “дышат” от музыки, не залипают на максимуме, есть дрейф/плавание.
+Liquid ring + tilt на превью/обложках (thumb), мягкий press (сейчас уже мягче).
+GitHub Pages совместимость: отказ от import.meta.env.BASE_URL в inline-скриптах, base-prefix вычисляется от location.pathname.
+Фаза 1 (делаем сейчас): “Music UX Pro” — без лишней мишуры
+Repeat режим (2 состояния)
+
+Off → Repeat Album (кнопка подсвечена)
+Repeat One (поверх подсвеченной кнопки маленькая “1”, как в плеерах)
+Сохранение состояния (логичнее для слушателя — localStorage, чтобы не сбрасывалось между заходами).
+Логика ended:
+Repeat One → перезапуск текущего трека
+Repeat Album → next (как сейчас)
+Off → как сейчас (если старт был на /music — ведём альбом, иначе отдаём miniPlayer)
+Drag-to-seek (реальное время)
+
+Перетаскивание по полосе прогресса (мышь + touch).
+Во время drag — сразу меняем audio.currentTime (как ты выбрал).
+(Опционально, но красиво) небольшой “time hint” при перетаскивании — можно добавить позже.
+Сохранение громкости
+
+Стартовое значение по умолчанию: 40%.
+Любое изменение слайдера сохраняется в localStorage.
+На всех страницах (music + miniPlayer) синхронизация от одного источника (глобальный audio.volume).
+Микро-улучшения /music
+
+При возврате на /music: автоматически раскрываем активный альбом и подсвечиваем/скроллим к текущему треку (без “прыжков”, аккуратно).
+Опционально: небольшая кнопка “к текущему треку”, если он вне видимой области (предлагаю после repeat/drag/volume).
+A11y (раз уж делаем как продукт)
+
+aria-pressed для Shuffle/Repeat.
+Корректные aria-label и title на интерактивных элементах.
+Нормальный :focus-visible (чтобы клавиатурой было приятно управлять).
+Учет prefers-reduced-motion там, где есть анимации.
+Лёгкая оптимизация
+
+Рендер списка альбомов через DocumentFragment (меньше перерисовок).
+Не тянуть лишнее: уже хорошо, что audio в preload="metadata".
+(Опционально) loading="lazy" для картинок там, где подходит.
+Фаза 2 (конечная цель твоей фазы): переключение Light/Dark Theme
+Кнопка рядом с RU/EN в навбаре.
+Тема применяется через класс на body + CSS-переменные (чтобы “логика элементов” и glass-стиль сохранились).
+Сохранение в localStorage и применение на astro:page-load.
+Важное про GitHub Pages лимиты и твою идею “сохранять всё в cookie”
+Ты правильно думаешь про ограничения, но cookies не подходят для хранения музыки/обложек:
+
+cookies маленькие и отправляются на сервер на каждый запрос (это ухудшит всё).
+Что реально помогает:
+
+обычный браузерный кэш (он и так есть),
+Service Worker (PWA-кэш): можно кэшировать albums.json, обложки, и даже mp3 после первого прослушивания (по желанию),
+для больших объёмов/популярности лучше хранить mp3 не в GitHub Pages, а на внешнем хранилище/CDN (например Cloudflare R2/Backblaze B2) и на сайте держать только JSON + ссылки.
+Это запомнил как риск проекта: если треков много и трафик высокий, GitHub Pages может начать ограничивать/выключать раздачу.
+
+BACKUP / Сводка проекта (для переноса в новый чат)
+Проект
+Astro сайт-портфолио: вкладки /, /music, /3d, /video, /games, /services, /about.
+Глобальный стиль: liquid glass + полупрозрачность, “apple-like” минимализм.
+Архитектура аудио
+audio#main-audio живёт в Layout.astro и имеет transition:persist, поэтому не сбрасывается при переходах.
+Глобальное состояние “что играет”:
+window._tt_nowPlaying
+window._tt_setNowPlaying(payload) → диспатчит nowplayingchange
+window._tt_getNowPlaying()
+/music (music.astro)
+Данные из public/data/albums.json.
+DOM списка альбомов/треков создаётся динамически (поэтому стили страницы должны быть глобальными: style is:global).
+Воспроизведение:
+safeMusicPath / safeMusicUrl с encodeURIComponent для папки/файла.
+Sync UI:
+синхронизация по nowplayingchange и/или по audio.src.
+Фичи:
+deep-link на трек: /music?folder=...&file=...
+share/copy link
+shuffle persistence (sessionStorage)
+cover-driven theme: цвет обложки вычисляется через canvas и задаёт CSS-переменные (тонкая “apple” подсветка)
+liquid ring + tilt (tt-thumb) на превью и на главной обложке плеера
+мягкий press на клики (без блика)
+Layout.astro
+Система языка RU/EN через data-ru / data-en, хранение lang в localStorage, событие langchange.
+Orbs (aurora blobs) исправлены:
+масштаб “дыхания” через CSS vars (не ломает transform-анимации)
+drift на wrapper .blob-wrap
+реакция на музыку через analyser (flux/beat), нет залипания
+Важный опыт: нельзя использовать import.meta.env.BASE_URL в inline-скриптах Astro. Для GitHub Pages используется вычисление base-prefix от location.pathname.
+MiniPlayer.astro
+Работает с тем же глобальным audio#main-audio и nowPlaying.
+Тот же стиль и tt-thumb на обложке.
+Текущий статус задач
+Исправления UI/навигации/мобилки/пропаданий — выполнены.
+Orbs — выполнено.
+i18n глобально отложен до конца наполнения контентом.
+Дальше по плану: Repeat (album/one), drag-to-seek, volume memory, restore open album+scroll, A11y, оптимизация.
+Если ок, следующим сообщением я дам готовые изменения (код) для:
+
+Repeat (album/one) + сохранение
+Drag-to-seek realtime
+Volume memory (40% default) + синхронизация с MiniPlayer
+Restore open album/scroll on return + A11y мелочи

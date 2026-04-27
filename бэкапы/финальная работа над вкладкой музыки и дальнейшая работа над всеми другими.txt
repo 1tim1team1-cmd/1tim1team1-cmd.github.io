@@ -1,0 +1,367 @@
+Ниже — “Backup / Project Context & Roadmap” документ (можно копировать целиком в новый чат/другому ИИ). Я постарался зафиксировать: цели, архитектуру, структуры папок/данных, текущую реализацию, решения по темам/переходам, UX‑манифест и план работ.
+
+BACKUP / timteam Portfolio (Astro) — Context, Architecture, Roadmap
+0) Проект: зачем и для кого
+Назначение сайта (3 цели):
+
+Личное портфолио‑хаб: хранить и структурировать творчество (музыка/3D/видео/игры), быстро добавлять и просматривать, убрать “хлам” с диска.
+Витрина для заказчиков услуг (монтаж, музыка, 3D, разработка): показать качество → привести к заказу.
+Для подписчиков/аудитории: отдельные вкладки по направлениям, удобное потребление контента.
+CTA:
+
+Главный: Заказать (в /services и/или глобально видимый контакт/кнопка).
+Вторичный: Просмотреть (портфолио/музыка/видео) + “подписаться/связаться”.
+Стиль:
+
+“Liquid glass / Apple‑like minimalism”, современный clean UI.
+“Живость” через микровзаимодействия и реакцию фона (orbs) на музыку.
+1) Технологии и платформа
+Framework: Astro
+Навигация: View Transitions / Client Router
+Хостинг: GitHub Pages (важно: base path вида /repo/)
+Данные: статические JSON + файлы в public/
+Музыка: <audio> глобально в Layout с transition:persist.
+2) Структура страниц (routes)
+Планируемые вкладки:
+
+/ (главная)
+/music (базовая эталонная вкладка по UX)
+/3d
+/video
+/games
+/services
+/about
+Стратегия: добить /music до “канона”, затем переносить паттерн на остальные вкладки (единый стиль, единая логика шаринга, deep‑link, sticky detail card и т.д.).
+
+3) Файловая структура (главное)
+Ключевые файлы:
+
+src/layouts/Layout.astro — глобальная оболочка: nav, theme/lang, orbs, global audio, mediaSession, hotkeys.
+src/pages/music.astro — альбомы/плеер/логика списка/шаринг/deep‑links.
+src/pages/index.astro — главная (пока “болванка”, будет переработка).
+src/styles/global.css — токены/стили glass + темы + базовые компоненты.
+Public assets:
+
+public/data/albums.json
+public/music/<albumFolder>/<trackFile>
+public/covers/<albumFolder>.jpg
+4) GitHub Pages / base-path совместимость (важно)
+Проблема: в inline‑скриптах Astro нельзя надёжно использовать import.meta.env.BASE_URL.
+
+Решение: вычислять basePrefix() от location.pathname (список известных routes) и строить абсолютные пути через abs(p).
+
+Эта логика используется в:
+
+music.astro (для треков/обложек/JSON)
+глобальном MediaSession блоке в Layout
+5) Глобальная архитектура аудио
+В Layout:
+
+<audio id="main-audio" preload="metadata" transition:persist></audio> — не сбрасывается при навигации.
+Глобальное состояние “что играет”:
+
+window._tt_nowPlaying
+window._tt_setNowPlaying(payload) → dispatch nowplayingchange
+window._tt_getNowPlaying()
+Ended routing:
+
+В Layout один раз биндится audio.addEventListener('ended', ...)
+Если существует window._tt_onEnded (задаёт активная страница), он вызывается; иначе — mpNext() (MiniPlayer).
+MediaSession + hotkeys:
+
+MediaSession metadata обновляется по nowplayingchange
+Hotkeys: Space play/pause, стрелки seek ±5/15, media keys next/prev.
+6) /music — текущая реализация (эталон)
+Данные
+Загружаются из public/data/albums.json
+Треки сортируются по num
+Длительности парсятся mm:ss / hh:mm:ss → секунды
+UI / рендер
+Альбомы: аккордеон.
+Рендер списка через DocumentFragment (оптимизация).
+Элементы трека/альбома создаются динамически → стили style is:global.
+Воспроизведение / state
+Безопасные URL: encodeURIComponent для folder/file сегментов.
+Deep‑link на трек:
+/music?folder=...&file=...
+опционально &play=1
+Синхронизация UI:
+по nowplayingchange и/или по audio.src (fallback).
+Playing‑подсветка трека + active‑альбом.
+Share/copy link
+На треке: маленькая кнопка “copy link”
+На плеере: “copy/share current”
+Использует navigator.share если доступно, иначе clipboard + toast.
+Repeat / Shuffle / Volume / Seek
+Repeat: repeatMode (0 off, 1 album, 2 one), хранится в localStorage.
+Shuffle: хранение в sessionStorage (order + enabled).
+Volume memory:
+дефолт 40%
+изменения в localStorage
+синхронизация UI с глобальным audio.volume
+Drag-to-seek realtime:
+pointer events (мышь + touch)
+во время drag сразу обновляет audio.currentTime
+touch-action: none на seek полосе
+Cover-driven theme (подсветка от обложки)
+Через canvas берётся средний цвет изображения
+задаются CSS vars: --np-c1 --np-c2 и --np-ac1/2 --np-border --np-fill --np-wave
+применяется к glow/градиентам/playing fill/подсветкам.
+A11y (частично внедрено)
+aria-pressed для shuffle/repeat
+role="button" tabindex="0" на album-header и track-row
+Enter/Space кликом через делегирование keydown
+учёт prefers-reduced-motion для pointer FX
+7) Theme system (Light/Dark) — финальная логика
+Цель: единая тема для всего сайта, без мигания (FOUC), с сохранением в localStorage.
+
+Где: Layout.astro
+
+Ранний inline‑скрипт в <head> выставляет класс на <html> и colorScheme.
+Дальше IIFE “theme system”:
+toggleTheme() меняет localStorage и классы на html/body
+initTheme() применяется на:
+astro:page-load
+astro:after-swap ← критически важно для View Transitions
+Баг и фикс:
+
+Белая шапка/кнопки после переходов (особенно /music и /video) исправилась добавлением:
+document.addEventListener('astro:after-swap', initTheme);
+CSS-токены темы:
+
+В global.css переменные glass/text/page-bg переключаются в dark.
+В идеале переменные держать на :root.theme-dark (html), чтобы не зависеть от body при swap.
+8) Orbs (aurora blobs) — audio-reactive v4
+Fixed background .aurora-bg сохраняется (transition:persist)
+JS:
+wraps .blob в .blob-wrap для drift
+drift — отдельный RAF, translate на wrapper
+breathing scale — через --b-scale на ::before, не ломает CSS float animations
+analyser (WebAudio) подключается к global audio
+“не залипают” на максимуме: сглаживание + gate/saturation + silent detection
+Реакция на музыку уже работает корректно.
+9) UX-манифест (принятые принципы)
+Витрина без трения: за 10–15 секунд понятно кто автор, что умеет, где примеры, как заказать.
+Единый паттерн на вкладки: list/grid → detail card (часто sticky), активный элемент, быстрые действия (share/copy), deep‑link.
+Apple-like минимализм: 1 главный объект + 1 основное действие + 1 вторичное.
+Живость как feedback: toast/подсветки/микропереходы — подтверждают состояние, а не просто “украшают”.
+A11y: удобная клавиатура, focus-visible, aria‑атрибуты, reduced motion.
+10) План развития (Roadmap)
+Фаза 1: “Music UX Pro” (довести /music до 100%)
+Уже сделано (по коду/описанию):
+
+repeat (off/album/one) + localStorage
+drag-to-seek realtime pointer
+volume memory 40% default + localStorage + sync
+restore/sync UI от nowPlaying/audio.src + auto open active album
+share/copy link per track/current
+shuffle persistence (sessionStorage)
+cover-driven theme
+orbs stable
+GitHub Pages base-prefix workaround
+Осталось/желательно добить в /music (перед переносом паттерна):
+
+Focus-visible стили (глобально): чтобы клавиатура ощущалась “продуктом”.
+aria-expanded + aria-controls для альбомов (аккордеон), чтобы было корректно для screen readers.
+Lazy loading картинок (album thumbs):
+loading="lazy" + decoding="async" для list covers.
+prefers-reduced-motion: проверить оставшиеся анимации (особенно hover/press и скроллы) — в reduce отключать smooth/сильные эффекты.
+(Опционально) “time hint” при перетаскивании seek (не обязательно сейчас).
+(Опционально) более строгая логика “кто владеет ended” если захочется продолжать альбом даже вне /music (сейчас это работает по текущей странице через _tt_onEnded).
+Фаза 1.5: Унификация “UI кирпичей” (для всех вкладок)
+Вынести в переиспользуемые модули/паттерны:
+
+Toast (одинаковый на всём сайте)
+Share/copy link helper
+Deep-link helper
+BasePrefix/abs helper (одна реализация)
+List rendering helpers (skeleton + fragment)
+A11y helpers (keyboard activate, aria patterns)
+(Дизайн) единые glass‑токены/уровни
+Фаза 2: Перенос паттерна /music на остальные вкладки
+/video (аналог /music по UX):
+
+список/категории → справа detail viewer (видео + описание)
+deep-link на ролик ?id=
+share/copy
+skeleton loader
+/3d (плитка + fullscreen detail):
+
+Grid view по умолчанию (100 изображений)
+кликабельный элемент → fullscreen/lightbox detail card с “воздухом”
+переключатель режима просмотра: Grid ↔ List (с описанием)
+deep-link ?id=
+share/copy
+lazy images обязателен
+/games
+
+4 проекта: карточки + detail view
+возможно: “скачать билд” (ссылка/кнопка, желательно с версионированием)
+deep-link на проект
+/services
+
+главный CTA заказа + быстрый контакт
+аккордеон услуг (как альбомы) → detail card справа
+кнопка “скопировать контакты”/“написать в TG”
+Фаза 3: Feedback / обратная связь
+Важно: GitHub Pages — статичный хостинг, формы без бекенда напрямую не сохранятся.
+Варианты:
+
+Formspree / Getform / Basin (простая форма → email)
+Google Forms (быстро, но менее “брендово”)
+Cloudflare Workers (мини‑API + KV/D1) — более “инженерный” вариант
+(Не рекомендуется) писать в GitHub Issues через токен (нельзя безопасно хранить токен на клиенте)
+UX идея feedback:
+
+“Was this helpful?” + причина (чекбоксы: визуал/удобство/интерфейс/контент) + текстовое поле + отправка.
+Доп. идеи (отложено)
+“Spotlight” (Ctrl/Cmd+K) — глобальный поиск по разделам/работам/трекам.
+“Quiz / guide” на главной: мягкий опросник “что тебе ближе” → ведёт в нужные вкладки.
+11) MiniPlayer (целевая концепция)
+На всех страницах: маленький минималистичный мини‑контрол (обложка, название, время, play/pause, next/prev, repeat).
+На главной: может быть более заметным горизонтальным блоком (временное текущее решение).
+Главный плеер остаётся на /music.
+12) Риск проекта / производительность
+GitHub Pages лимиты: большой объём mp3 + трафик может стать проблемой.
+Что помогает:
+браузерный cache
+Service Worker (PWA cache) для albums.json, обложек, треков после первого прослушивания (опционально)
+при росте: вынести mp3 на внешнее хранилище/CDN (R2/B2) и оставить на GH Pages только JSON + ссылки.
+Текущее состояние (коротко)
+/music — фактически “почти продукт”: repeat/seek/volume/share/deep-link/theme/glow/shuffle/a11y база.
+Тема: исправлен критичный баг переходов через astro:after-swap.
+Следующий шаг: добить “мелочи /music” (focus-visible, aria-expanded, lazy images, reduce motion polish) → вынести общие кирпичи → переносить паттерн на /video (первым).
+Если ты ок с этим документом, следующий шаг предлагаю такой (по порядку и без расползания):
+
+Добиваем /music: focus-visible + aria-expanded/controls + lazy covers (и быстрый audit prefers-reduced-motion).
+После этого — делаем “UI кирпичи” (toast/share/basePrefix) общими.
+Затем стартуем /video по тому же паттерну.
+Скажи: хочешь начать с пункта (1) прямо сейчас? Если да — я дам конкретные изменения в global.css + music.astro (минимальные диффы).
+
+BACKUP ADDENDUM (v2) — унификация “TT Core” + старт плана /video (под твою структуру)
+Это продолжение большого backup-документа. Добавляй этот блок в конец “сводки”.
+
+13) Обновления после /music 100% QA + старт унификации
+13.1. Глобальный Toast (единый на весь сайт)
+Цель: убрать локальные тосты со страниц, сделать единый стиль/поведение, доступный всем вкладкам.
+
+Реализация:
+
+src/styles/global.css:
+добавлен .tt-toast + .tt-toast.show
+добавлен dark‑вариант :root.theme-dark .tt-toast
+src/layouts/Layout.astro:
+добавлен контейнер:
+HTML
+
+<div id="ttToast" class="tt-toast" aria-live="polite" transition:persist></div>
+контейнер фиксированный, всегда доступен для TT.toast() и сохраняется при навигации благодаря transition:persist.
+Ожидаемый вывод:
+
+Любая страница может показывать toast единообразно.
+Не требуется локальная разметка тоста в /music, /video и т.д.
+13.2. TT Core Helpers (глобальный набор утилит для всех страниц)
+Цель: убрать дубли кода с каждой вкладки: base-path, abs() для GH Pages, share/copy, scroll с prefers-reduced-motion, escape HTML.
+
+Где: Layout.astro (важно: размещать до <slot />, чтобы страницы могли пользоваться этим объектом в своих inline-скриптах).
+
+API:
+
+TT.basePrefix() — определяет базовый префикс для GH Pages (/repo/)
+TT.abs(path) — строит base-aware URL к /public/...
+TT.isReducedMotion() — prefers-reduced-motion
+TT.smartScrollIntoView(el, {block}) — авто “smooth/auto”
+TT.toast(msg, {ms}) — глобальный toast
+TT.copyToClipboard(text) — копирование (с fallback)
+TT.shareOrCopy({url,title}) — navigator.share → иначе clipboard + toast
+TT.escHtml(str) — экранирование текста для template strings
+Критичный фикс, который уже учтён:
+
+В inline JS нельзя использовать TypeScript-синтаксис (например (): string => {}) — вызывает Unexpected token ')'.
+Поэтому весь TT Core — чистый JavaScript.
+Ожидаемый вывод:
+
+Страницы (/music, будущий /video, /3d) используют одну базу TT.*.
+Меньше копипасты, меньше ошибок, быстрее перенос паттерна.
+13.3. Текущий статус /music (после QA)
+Проверено и работает:
+
+Deep-link: /music?folder=...&file=... (и корректное раскрытие/подсветка)
+Repeat: Off / Repeat Album / Repeat One + persistence в localStorage
+Shuffle: persistence в sessionStorage
+Volume: default 40%, память в localStorage, синхронизация UI
+Drag-to-seek: pointer drag + realtime
+Seek keyboard: стрелки/shift/home/end по фокусу на полосе
+A11y: focus-visible (глобально), Enter/Space на альбом/трек, aria-pressed, aria-expanded/controls
+prefers-reduced-motion: корректное поведение (scroll без smooth, эффекты отключаются)
+Lazy covers: исправлено (img не display:none, используется opacity)
+Системная заметка:
+
+В DevTools может появляться сообщение [Intervention] Images loaded lazily... — это не ошибка, можно игнорировать.
+14) Следующий крупный этап: /video по паттерну /music (план)
+14.1. Твоя принятая структура папок/нейминга (как для музыки)
+Музыка уже:
+
+public/music/<AlbumFolder>/<TrackFile>
+public/covers/<AlbumFolder>.jpg
+public/data/albums.json
+Видео будет аналогично:
+
+Видео файлы:
+public/Videos/<Folder>/<File>.mp4
+(регистр важен: на GH Pages чувствителен к регистру; лучше заранее выбрать единый стиль, напр. public/videos маленькими)
+Обложки:
+public/covers/Videos/<idOrFileBase>.jpg
+для 3D-рендеров аналогично: public/covers/Photos/... (или другое имя по твоему соглашению)
+Данные:
+public/data/videos.json
+Ключевой принцип: единый нейминг — файлы, обложки и записи в JSON должны совпадать по имени/идентификатору.
+
+14.2. UX / структура /video (канонично под сайт)
+Цель: повторить паттерн /music для консистентности и скорости разработки.
+
+UI:
+
+Список видео (аккордеон/категории/группы) — как список альбомов.
+Sticky “Video Player Card” — как player-card в /music:
+превью/обложка
+название/описание
+прогресс/время
+play/pause
+mute/volume
+fullscreen
+share/copy link
+Deep-link:
+/video?id=<videoId> (или /video?folder=...&file=... — выбрать перед реализацией)
+при открытии по ссылке: раскрыть категорию, подсветить элемент, обновить URL без лишнего.
+Опционально (позже):
+
+фильтр по папкам/тегам
+режим отображения (плитка/список с описаниями)
+Performance:
+
+lazy loading обложек
+skeleton loaders
+mp4 — сжатые (как ты планируешь) + загрузка по требованию (не prefetch всё)
+14.3. Техническая архитектура /video (планируемая)
+Видео-плеер: <video> (скорее локальный для /video, не глобальный, т.к. глобальный у нас только audio).
+Синхронизация состояния:
+отдельное состояние /video (current video id, current time)
+share/copy через TT.shareOrCopy
+пути к файлам через TT.abs
+A11y:
+элементы списка: role="button" tabindex="0"
+Enter/Space = action
+aria-expanded для групп (если аккордеон)
+15) Ближайшие шаги после /video (коротко)
+/video как “второй эталон” (list → sticky viewer → deep-link/share)
+/3d:
+grid + fullscreen detail (с описанием)
+deep-link/share
+lazy images обязательно
+MiniPlayer (малый, глобальный):
+показывается на всех страницах как компактный контрол аудио
+/games, /services, /about — по общей системе UI кирпичей
+Примечание по GitHub Pages и регистру путей
+На Windows пути не чувствительны к регистру, а на GH Pages — чувствительны.
+Если ты создаёшь public/Videos, то URL будет /Videos/..., и TT.abs('Videos/...') должен совпадать регистром. Лучше заранее стандартизировать папки в нижнем регистре (public/videos) — но это решение можно принять перед кодом.

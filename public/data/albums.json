@@ -1,0 +1,829 @@
+{
+  "generated": "2026-04",
+  "totalTracks": 100,
+  "estimatedHours": 6,
+  "albums": [
+    {
+      "id": "laboratory",
+      "folder": "02Laboratory",
+      "title": {
+        "ru": "Лаборатория",
+        "en": "Laboratory"
+      },
+      "emoji": "🧪",
+      "cover": "/covers/02Laboratory.jpg",
+      "description": {
+        "ru": "Первый опыт в написании музыки. Саундтрек к короткометражному фильму про безумного учёного и его лабораторию. Конец 2021 — начало 2022.",
+        "en": "First music experience. Soundtrack for a short film about a mad scientist and his laboratory. End of 2021 — beginning of 2022."
+      },
+      "totalDuration": null,
+      "tracks": [
+        {
+          "num": 1,
+          "title": "Trailer",
+          "file": "01Trailer.mp3",
+          "duration": 237
+        },
+        {
+          "num": 2,
+          "title": "Storm",
+          "file": "02Storm.mp3",
+          "duration": 43
+        },
+        {
+          "num": 3,
+          "title": "Despair",
+          "file": "03Despair.mp3",
+          "duration": 125 
+        },
+        {
+          "num": 4,
+          "title": "Amnesia",
+          "file": "04Amnesia.mp3",
+          "duration": 152 
+        },
+        {
+          "num": 5,
+          "title": "Cloning himself",
+          "file": "05cloning himself.mp3",
+          "duration": 117 
+        },
+        {
+          "num": 6,
+          "title": "Nostalgia",
+          "file": "06Nostalgia.mp3",
+          "duration": 85 
+        },
+        {
+          "num": 7,
+          "title": "Wake me up",
+          "file": "07Wake me up.mp3",
+          "duration": 87 
+        },
+        {
+          "num": 8,
+          "title": "Abyss of mind",
+          "file": "08Abyss of mind.mp3",
+          "duration": 107 
+        },
+        {
+          "num": 9,
+          "title": "The dark descent",
+          "file": "09The dark descent.mp3",
+          "duration": 51
+        }
+      ]
+    },
+    {
+      "id": "despair",
+      "folder": "03Despair",
+      "title": {
+        "ru": "Отчаяние",
+        "en": "Despair"
+      },
+      "emoji": "🌑",
+      "cover": "/covers/03Despair.jpg",
+      "description": {
+        "ru": "Кульминация депрессии на протяжении 2025 года. В точности передаёт, как страдало тело и разум, как разрушали вредные привычки — и как сквозь тьму нашёлся выход.",
+        "en": "The culmination of depression throughout 2025. Precisely conveys how body and mind suffered, how destructive habits took their toll — and how light was eventually found through the darkness."
+      },
+      "totalDuration": null,
+      "tracks": [
+        {
+          "num": 1,
+          "title": "Music solo",
+          "file": "01music solo.mp3",
+          "duration": 133 
+        },
+        {
+          "num": 2,
+          "title": "Me my friend postpunk",
+          "file": "02me my friend postpunk.mp3",
+          "duration": 171 
+        },
+        {
+          "num": 3,
+          "title": "Intracranial",
+          "file": "03intracranial.mp3",
+          "duration": 179 
+        },
+        {
+          "num": 4,
+          "title": "Lost part of me",
+          "file": "04lost part of me.mp3",
+          "duration": 132 
+        },
+        {
+          "num": 5,
+          "title": "Timteam i am dust and nothing more",
+          "file": "05timteam i am dust and nothing more.mp3",
+          "duration": 106 
+        },
+        {
+          "num": 6,
+          "title": "Psyhosis madness insanity",
+          "file": "06psyhosis madness insanity.mp3",
+          "duration": 136 
+        },
+        {
+          "num": 7,
+          "title": "Look!  i am peace of... nevermind",
+          "file": "07look!  i am peace of... nevermind.mp3",
+          "duration": 208 
+        },
+        {
+          "num": 8,
+          "title": "Come closer im not bite",
+          "file": "08come closer im not bite.mp3",
+          "duration": 235 
+        },
+        {
+          "num": 9,
+          "title": "Dont love me again",
+          "file": "09dont love me again.mp3",
+          "duration": 180 
+        }
+      ]
+    },
+    {
+      "id": "hope",
+      "folder": "05Hope",
+      "title": {
+        "ru": "Надежда",
+        "en": "Hope"
+      },
+      "emoji": "🌅",
+      "cover": "/covers/05Hope.jpg",
+      "description": {
+        "ru": "Третий альбом, начало 2025. Депрессия начала обретать форму — философия классических инструментов страдающего разума, начавшего понимать свои чувства.",
+        "en": "Third album, early 2025. Depression began taking shape — the philosophy of classical instruments of a suffering mind beginning to understand its own feelings."
+      },
+      "totalDuration": null,
+      "tracks": [
+        {
+          "num": 1,
+          "title": "Take a nap",
+          "file": "01take a nap.mp3",
+          "duration": 150 
+        },
+        {
+          "num": 2,
+          "title": "Theater",
+          "file": "02theater.mp3",
+          "duration": 156 
+        },
+        {
+          "num": 3,
+          "title": "Bastion of pigs",
+          "file": "03bastion of pigs.mp3",
+          "duration": 111 
+        },
+        {
+          "num": 4,
+          "title": "Flight of fantasy",
+          "file": "04flight of fantasy.mp3",
+          "duration": 126 
+        },
+        {
+          "num": 5,
+          "title": "Surrealism",
+          "file": "05surrealism.mp3",
+          "duration": 178 
+        },
+        {
+          "num": 6,
+          "title": "Citadel",
+          "file": "06citadel.mp3",
+          "duration": 92 
+        },
+        {
+          "num": 7,
+          "title": "Hopefull end",
+          "file": "07hopefull end.mp3",
+          "duration": 172 
+        },
+        {
+          "num": 8,
+          "title": "Cracked mindness",
+          "file": "08cracked mindness.mp3",
+          "duration": 92 
+        }
+      ]
+    },
+    {
+      "id": "noise",
+      "folder": "04Noise",
+      "title": {
+        "ru": "Шум",
+        "en": "Noise"
+      },
+      "emoji": "💥",
+      "cover": "/covers/04Noise.jpg",
+      "description": {
+        "ru": "Четвёртый альбом, весна 2025. Об аварии на скорости 80 км/ч с тяжёлыми ранениями — выкарабкался, и именно это происшествие помогло найти светлый путь и выйти из депрессии.",
+        "en": "Fourth album, spring 2025. About a crash at 80 km/h with serious injuries — survived, and this very incident helped find a brighter path and overcome depression."
+      },
+      "totalDuration": null,
+      "tracks": [
+        {
+          "num": 1,
+          "title": "Bones are cracked",
+          "file": "01bones are cracked.mp3",
+          "duration": 144 
+        },
+        {
+          "num": 2,
+          "title": "ive had enough",
+          "file": "02ive had enough.mp3",
+          "duration": 91 
+        },
+        {
+          "num": 3,
+          "title": "im fed up",
+          "file": "03im fed up.mp3",
+          "duration": 103 
+        },
+        {
+          "num": 4,
+          "title": "Mp3",
+          "file": "04mp3.mp3",
+          "duration": 114 
+        }
+      ]
+    },
+    {
+      "id": "lost in sound found in the stars",
+      "folder": "06Lost in sound found in the stars",
+      "title": {
+        "ru": "Потерян в звуке найден в звёздах",
+        "en": "Lost in Sound Found in the Stars"
+      },
+      "emoji": "🚀",
+      "cover": "/covers/06Lost in sound found in the stars.jpg",
+      "description": {
+        "ru": "Пятый альбом, середина 2025. Саундтрек к короткометражному фильму о космических войнах рас роботов — эпический и атмосферный.",
+        "en": "Fifth album, mid 2025. Soundtrack for a short film about cosmic wars between robot races — epic and atmospheric."
+      },
+      "totalDuration": null,
+      "tracks": [
+        {
+          "num": 1,
+          "title": "Galactic attack",
+          "file": "01galactic attack.mp3",
+          "duration": 162 
+        },
+        {
+          "num": 2,
+          "title": "Creations is dust",
+          "file": "02creations is dust.mp3",
+          "duration": 107 
+        },
+        {
+          "num": 3,
+          "title": "So lift off",
+          "file": "03so lift off.mp3",
+          "duration": 98 
+        },
+        {
+          "num": 4,
+          "title": "It is galactic space",
+          "file": "04it is galactic space.mp3",
+          "duration": 92 
+        },
+        {
+          "num": 5,
+          "title": "Im in the ships way",
+          "file": "05im in the ships way.mp3",
+          "duration": 92 
+        }
+      ]
+    },
+    {
+      "id": "slowed_up",
+      "folder": "07Slowed Up",
+      "title": {
+        "ru": "Замедлен и Ускорен",
+        "en": "Slowed Up"
+      },
+      "emoji": "⏱️",
+      "cover": "/covers/07Slowed Up.jpg",
+      "description": {
+        "ru": "Написан в лагере в 2024 году. Очень медленный, очень динамичный — ломает восприятие одной и той же музыки через её замедленную и ускоренную версию.",
+        "en": "Written at camp in 2024. Very slow, very dynamic — shatters the perception of the same music through its slowed-down and sped-up versions."
+      },
+      "totalDuration": null,
+      "tracks": [
+        {
+          "num": 1,
+          "title": "Choose your side",
+          "file": "01choose your side.mp3",
+          "duration": 85 
+        },
+        {
+          "num": 2,
+          "title": "Timteam bring the bright view",
+          "file": "02timteam bring the bright view.mp3",
+          "duration": 85 
+        },
+        {
+          "num": 3,
+          "title": "Timteam music philharmonic",
+          "file": "03timteam music philharmonic.mp3",
+          "duration": 60 
+        },
+        {
+          "num": 4,
+          "title": "You made the right choice",
+          "file": "04you made the right choice.mp3",
+          "duration": 128 
+        },
+        {
+          "num": 5,
+          "title": "Timteam incredibly deep",
+          "file": "05timteam incredibly deep.mp3",
+          "duration": 128 
+        },
+        {
+          "num": 6,
+          "title": "Timteam deeper than deep",
+          "file": "06timteam deeper than deep.mp3",
+          "duration": 90 
+        }
+      ]
+    },
+    {
+      "id": "dramatic",
+      "folder": "08dramatic",
+      "title": {
+        "ru": "Драматик",
+        "en": "Dramatic"
+      },
+      "emoji": "🎭",
+      "cover": "/covers/08dramatic.jpg",
+      "description": {
+        "ru": "Второй альбом, конец 2023 — начало 2024. Написан в период тяжёлой депрессии и в точности передаёт боль того времени.",
+        "en": "Second album, end of 2023 — beginning of 2024. Written during severe depression, conveying the pain of that period with precision."
+      },
+      "totalDuration": null,
+      "tracks": [
+        {
+          "num": 1,
+          "title": "Dramatic",
+          "file": "01dramatic.mp3",
+          "duration": 179 
+        },
+        {
+          "num": 2,
+          "title": "Ghost",
+          "file": "02ghost.mp3",
+          "duration": 85 
+        },
+        {
+          "num": 3,
+          "title": "Low light",
+          "file": "03low light.mp3",
+          "duration": 119 
+        }
+      ]
+    },
+    {
+      "id": "cassy",
+      "folder": "09Cassy",
+      "title": {
+        "ru": "Кэсси",
+        "en": "Cassy"
+      },
+      "emoji": "🧝",
+      "cover": "/covers/09Cassy.jpg",
+      "description": {
+        "ru": "Альбом 2026 года, ещё не завершён. Посвящён авторскому игровому и аниме-проекту про эльфийку Кэсси — активно пополняется новыми треками.",
+        "en": "2026 album, not yet finished. Dedicated to the original gaming and anime project about elf Cassy — actively expanding with new tracks."
+      },
+      "totalDuration": null,
+      "tracks": [
+        {
+          "num": 1,
+          "title": "Cassy HaruNeko",
+          "file": "01Cassy HaruNeko.mp3",
+          "duration": 247 
+        },
+        {
+          "num": 2,
+          "title": "Cassy Bored part",
+          "file": "02Cassy Bored part.mp3",
+          "duration": 109 
+        },
+        {
+          "num": 3,
+          "title": "Cassy history of past",
+          "file": "03Cassy history of past.mp3",
+          "duration": 310 
+        },
+        {
+          "num": 4,
+          "title": "Cassy",
+          "file": "04Cassy.mp3",
+          "duration": 60 
+        },
+        {
+          "num": 5,
+          "title": "Cassy",
+          "file": "05Cassy.mp3",
+          "duration": 84 
+        }
+      ]
+    },
+    {
+      "id": "ambients_01",
+      "folder": "10Ambients_01",
+      "title": {
+        "ru": "Эмбиенты 01",
+        "en": "Ambients 01"
+      },
+      "emoji": "🌊",
+      "cover": "/covers/10Ambients_01.jpg",
+      "description": {
+        "ru": "Первые эмбиент-работы. Начало пути в жанре — атмосферные текстуры и медитативные звуковые ландшафты.",
+        "en": "First ambient works. The beginning of the journey in the genre — atmospheric textures and meditative sonic landscapes."
+      },
+      "totalDuration": null,
+      "tracks": [
+        {
+          "num": 1,
+          "title": "One lost",
+          "file": "01one lost.mp3",
+          "duration": 121 
+        },
+        {
+          "num": 2,
+          "title": "Two classical",
+          "file": "02two classical.mp3",
+          "duration": 182 
+        },
+        {
+          "num": 3,
+          "title": "Three the sleep",
+          "file": "03three the sleep.mp3",
+          "duration": 283 
+        },
+        {
+          "num": 4,
+          "title": "Four large",
+          "file": "04four large.mp3",
+          "duration": 81 
+        },
+        {
+          "num": 5,
+          "title": "Five the theory",
+          "file": "05five the theory.mp3",
+          "duration": 192 
+        }
+      ]
+    },
+   {
+  "id": "ambients_02",
+  "folder": "11Ambients_02",
+  "title": {
+    "ru": "Эмбиенты 02",
+    "en": "Ambients 02"
+  },
+  "emoji": "🌌",
+  "cover": "/covers/11Ambients_02.jpg",
+  "description": {
+    "ru": "Более зрелые эмбиент-работы — второй этап. Глубже, богаче, тоньше.",
+    "en": "More mature ambient works — second stage. Deeper, richer, more refined."
+  },
+  "totalDuration": null,
+  "tracks": [
+    {
+      "num": 1,
+      "title": "Lost Part",
+      "file": "01Lost Part.mp3",
+      "duration": 240 
+    },
+    {
+      "num": 2,
+      "title": "Go To Home",
+      "file": "02Go To Home.mp3",
+      "duration": 240 
+    },
+    {
+      "num": 3,
+      "title": "A Whisper To The Ghost Within",
+      "file": "03A Whisper To The Ghost Within.mp3",
+      "duration": 240 
+    },
+    {
+      "num": 4,
+      "title": "Good Night",
+      "file": "04Good Night.mp3",
+      "duration": 258 
+    },
+    {
+      "num": 5,
+      "title": "Peaceful Place",
+      "file": "05Peaceful Place.mp3",
+      "duration": 246 
+    }
+  ]
+},
+    {
+      "id": "dino_game",
+      "folder": "12Dino game",
+      "title": {
+        "ru": "Dino Game",
+        "en": "Dino Game"
+      },
+      "emoji": "🦕",
+      "cover": "/covers/12Dino game.jpg",
+      "description": {
+        "ru": "Саундтрек к игре Dino на Python, разработанной для школьного проекта по программированию — занял первое место.",
+        "en": "Soundtrack for a Python Dino game developed for a school programming project — first place."
+      },
+      "totalDuration": null,
+      "tracks": [
+        {
+          "num": 1,
+          "title": "Menu",
+          "file": "01Menu.mp3",
+          "duration": 234 
+        },
+        {
+          "num": 2,
+          "title": "Game",
+          "file": "02Game.mp3",
+          "duration": 69 
+        },
+        {
+          "num": 3,
+          "title": "Achievment",
+          "file": "03Achievment.mp3",
+          "duration": 45 
+        }
+      ]
+    },
+    {
+      "id": "not_relised",
+      "folder": "13Not relised",
+      "title": {
+        "ru": "Без Релиза",
+        "en": "Not Released"
+      },
+      "emoji": "🎲",
+      "cover": "/covers/13Not relised.jpg",
+      "description": {
+        "ru": "Треки, которые хороши, но по разным причинам не вошли ни в один из альбомов. Демо, незаконченные идеи и скрытые жемчужины — их должен услышать свет.",
+        "en": "Tracks that are good but did not make it into any album for various reasons. Demos, unfinished ideas and hidden gems — they deserve to be heard."
+      },
+      "totalDuration": null,
+      "tracks": [
+        {
+          "num": 1,
+          "title": "Loving You",
+          "file": "01Loving You.mp3",
+          "duration": 226 
+        },
+        {
+          "num": 2,
+          "title": "Smooth",
+          "file": "02smooth.mp3",
+          "duration": 153 
+        },
+        {
+          "num": 3,
+          "title": "Basses",
+          "file": "03Basses.mp3",
+          "duration": 213 
+        },
+        {
+          "num": 4,
+          "title": "On 100 percent",
+          "file": "04On 100 percent.mp3",
+          "duration": 210 
+        },
+        {
+          "num": 5,
+          "title": "Experiment",
+          "file": "05Experiment.mp3",
+          "duration": 150 
+        },
+        {
+          "num": 6,
+          "title": "The rock",
+          "file": "06the rock.mp3",
+          "duration": 132 
+        },
+        {
+          "num": 7,
+          "title": "_Symphony",
+          "file": "07_Symphony.mp3",
+          "duration": 150 
+        },
+        {
+          "num": 8,
+          "title": ".fkmg",
+          "file": "08.fkmg.mp3",
+          "duration": 169
+        },
+        {
+          "num": 9,
+          "title": "Aria math",
+          "file": "09aria math.mp3",
+          "duration": 390 
+        },
+        {
+          "num": 10,
+          "title": "Eww",
+          "file": "10eww.mp3",
+          "duration": 117 
+        },
+        {
+          "num": 11,
+          "title": "Just sample",
+          "file": "11just sample.mp3",
+          "duration": 16 
+        },
+        {
+          "num": 12,
+          "title": "Kishlack",
+          "file": "12kishlack.mp3",
+          "duration": 180 
+        },
+        {
+          "num": 13,
+          "title": "Ringtone",
+          "file": "13Ringtone.mp3",
+          "duration": 84 
+        },
+        {
+          "num": 14,
+          "title": "You wrong",
+          "file": "14You wrong.mp3",
+          "duration": 96 
+        },
+        {
+          "num": 15,
+          "title": "Soulhealth",
+          "file": "15soulhealth.mp3",
+          "duration": 270 
+        },
+        {
+          "num": 16,
+          "title": "Strunes of life",
+          "file": "16Strunes of life.mp3",
+          "duration": 284 
+        },
+        {
+          "num": 17,
+          "title": "The dragon",
+          "file": "17the dragon.mp3",
+          "duration": 192 
+        },
+        {
+          "num": 18,
+          "title": "Time of change",
+          "file": "18time of change.mp3",
+          "duration": 175 
+        },
+        {
+          "num": 19,
+          "title": "Xpand",
+          "file": "19xpand.mp3",
+          "duration": 240 
+        },
+        {
+          "num": 20,
+          "title": "Pennywise",
+          "file": "20Pennywise.mp3",
+          "duration": 57 
+        },
+        {
+          "num": 21,
+          "title": "Guitar",
+          "file": "21Guitar.mp3",
+          "duration": 112 
+        },
+        {
+          "num": 22,
+          "title": "Demo",
+          "file": "22Demo.mp3",
+          "duration": 196 
+        },
+        {
+          "num": 23,
+          "title": "Doomer",
+          "file": "23Doomer.mp3",
+          "duration": 74 
+        },
+        {
+          "num": 24,
+          "title": "Intiresting way",
+          "file": "24Intiresting way.mp3",
+          "duration": 86 
+        },
+        {
+          "num": 25,
+          "title": "Cool stuff",
+          "file": "25Cool stuff.mp3",
+          "duration": 34 
+        },
+        {
+          "num": 26,
+          "title": "Piano",
+          "file": "26Piano.mp3",
+          "duration": 124 
+        },
+        {
+          "num": 27,
+          "title": "Motivate you",
+          "file": "27Motivate you.mp3",
+          "duration": 204 
+        },
+        {
+          "num": 28,
+          "title": "My Think",
+          "file": "28My Think.mp3",
+          "duration": 92 
+        },
+        {
+          "num": 29,
+          "title": "Together",
+          "file": "29Together.mp3",
+          "duration": 86 
+        },
+        {
+          "num": 30,
+          "title": "_8 bit",
+          "file": "30_8 bit.mp3",
+          "duration": 181 
+        },
+        {
+          "num": 31,
+          "title": "80s",
+          "file": "3180s.mp3",
+          "duration": 150 
+        },
+        {
+          "num": 32,
+          "title": "Ambient beta",
+          "file": "32ambient beta.mp3",
+          "duration": 65 
+        },
+        {
+          "num": 33,
+          "title": "Hello there!",
+          "file": "33Hello there!.mp3",
+          "duration": 192 
+        },
+        {
+          "num": 34,
+          "title": "Foxy",
+          "file": "34foxy.mp3",
+          "duration": 28 
+        },
+        {
+          "num": 35,
+          "title": "Melodic",
+          "file": "35Melodic.mp3",
+          "duration": 39 
+        },
+        {
+          "num": 36,
+          "title": "Spase song",
+          "file": "36spase song.mp3",
+          "duration": 116 
+        },
+        {
+          "num": 37,
+          "title": "Rk800 - Connor",
+          "file": "37Rk800 - Connor.mp3",
+          "duration": 251 
+        },
+        {
+          "num": 38,
+          "title": "Melodic two",
+          "file": "38melodic two.mp3",
+          "duration": 198 
+        },
+        {
+          "num": 39,
+          "title": "Springtrap",
+          "file": "39springtrap.mp3",
+          "duration": 28 
+        },
+        {
+          "num": 40,
+          "title": "Just music",
+          "file": "40just music.mp3",
+          "duration": 87 
+        },
+        {
+          "num": 41,
+          "title": "Apfs",
+          "file": "41apfs.mp3",
+          "duration": 158 
+        }
+      ]
+    }
+  ]
+}

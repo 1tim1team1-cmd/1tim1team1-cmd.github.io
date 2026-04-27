@@ -1,0 +1,866 @@
+---
+import * as AstroTransitions from 'astro:transitions';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'timteam · portfolio',
+  description = '3D artist, musician and developer',
+} = Astro.props as Props;
+
+const ViewTransitions =
+  (AstroTransitions as any).ViewTransitions ?? (AstroTransitions as any).ClientRouter;
+
+const currentPath = Astro.url.pathname;
+
+// ── Base-aware helpers (for GitHub Pages /repo/) ─────────────
+const BASE = import.meta.env.BASE_URL || '/';
+const withBase = (p: string) => {
+  const b = BASE.endsWith('/') ? BASE : BASE + '/';
+  return b + String(p).replace(/^\/+/, '');
+};
+const stripBase = (pathname: string) => {
+  if (!BASE || BASE === '/') return pathname;
+  return pathname.startsWith(BASE) ? '/' + pathname.slice(BASE.length) : pathname;
+};
+const relPath = stripBase(currentPath);
+---
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+
+  <!-- system theme support -->
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#faf5ff" />
+
+  <!-- Apply theme ASAP (prevents flash) -->
+  <script is:inline>
+    (() => {
+      const KEY = 'theme'; // 'light' | 'dark' | null (system)
+      const stored = (() => { try { const v = localStorage.getItem(KEY); return (v === 'light' || v === 'dark') ? v : null; } catch { return null; } })();
+      const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const t = stored || (sysDark ? 'dark' : 'light');
+      document.documentElement.classList.add('theme-' + t);
+      // body may not exist yet; we also set it later
+      document.documentElement.style.colorScheme = t;
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  {ViewTransitions ? <ViewTransitions /> : null}
+</head>
+
+<body>
+<div id="ttToast" class="tt-toast" aria-live="polite" transition:persist></div>
+<script is:inline>
+  (() => {
+    const TT = window.TT || (window.TT = {});
+    if (TT.__coreInited) return;
+    TT.__coreInited = true;
+
+    const KNOWN = new Set(['', 'music', '3d', 'video', 'games', 'services', 'about']);
+
+    TT.basePrefix = function () {
+      const clean = location.pathname.replace(/^\/+|\/+$/g, '');
+      const first = clean.split('/')[0] || '';
+      return KNOWN.has(first) ? '/' : `/${first}/`;
+    };
+
+    TT.abs = function (p) {
+      const BASE = TT.basePrefix();
+      return BASE + String(p).replace(/^\/+/, '');
+    };
+
+    TT.isReducedMotion = function () {
+      return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    };
+
+    TT.smartScrollIntoView = function (el, { block = 'nearest' } = {}) {
+      if (!el || !el.scrollIntoView) return;
+      el.scrollIntoView({ block, behavior: TT.isReducedMotion() ? 'auto' : 'smooth' });
+    };
+
+    function getToastEl() {
+      let el = document.getElementById('ttToast');
+      if (el) return el;
+      el = document.createElement('div');
+      el.id = 'ttToast';
+      el.className = 'tt-toast';
+      el.setAttribute('aria-live', 'polite');
+      document.body.appendChild(el);
+      return el;
+    }
+
+    TT.toast = function (msg, { ms = 1400 } = {}) {
+      const el = getToastEl();
+      el.textContent = String(msg ?? '');
+      el.classList.add('show');
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove('show'), ms);
+    };
+
+    TT.copyToClipboard = async function (text) {
+      try {
+        await navigator.clipboard.writeText(String(text));
+        return true;
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = String(text);
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          return true;
+        } catch {
+          document.body.removeChild(ta);
+          return false;
+        }
+      }
+    };
+
+    TT.shareOrCopy = async function ({ url, title } = {}) {
+      const lang = window._tt_lang || (function () {
+        try { return localStorage.getItem('lang') || 'ru'; } catch { return 'ru'; }
+      })();
+
+      if (!url) return false;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: title || 'timteam', url });
+          TT.toast(lang === 'ru' ? 'Открыто меню “Поделиться”' : 'Share menu opened');
+          return true;
+        } catch {}
+      }
+
+      const ok = await TT.copyToClipboard(String(url));
+      TT.toast(ok ? (lang === 'ru' ? 'Ссылка скопирована' : 'Link copied')
+                  : (lang === 'ru' ? 'Не удалось скопировать' : 'Copy failed'));
+      return ok;
+    };
+
+    TT.escHtml = function (str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    };
+  })();
+</script>
+  <!-- ─── AURORA BACKGROUND ──────────────────────────────── -->
+  <div class="aurora-bg" id="auroraBg" transition:persist>
+    <div class="blob blob-a" id="blob0" style="width:360px;height:360px;background:#c4b5fd;top:-80px;left:-80px;"></div>
+    <div class="blob blob-b" id="blob1" style="width:300px;height:300px;background:#7dd3fc;top:120px;right:-60px;"></div>
+    <div class="blob blob-c" id="blob2" style="width:260px;height:260px;background:#6ee7b7;bottom:-60px;left:38%;"></div>
+    <div class="blob blob-d" id="blob3" style="width:200px;height:200px;background:#fda4af;bottom:80px;right:100px;"></div>
+    <div class="blob blob-a" id="blob4" style="width:220px;height:220px;background:#c4b5fd;top:55%;left:22%;animation-delay:2s;opacity:0.28;"></div>
+    <div class="blob blob-b" id="blob5" style="width:180px;height:180px;background:#a78bfa;top:30%;left:55%;animation-delay:3.5s;opacity:0.22;"></div>
+  </div>
+
+  <!-- ─── NAV ────────────────────────────────────────────── -->
+  <nav style="position:sticky;top:14px;z-index:100;padding:0 20px;">
+    <div class="glass-pill nav-bar" id="navBar">
+      <a href={withBase('')} class="nav-logo" transition:name="logo">timteam</a>
+
+      <div class="nav-links" id="navLinks">
+        <a href={withBase('')} class={`nav-link ${relPath === '/' ? 'active' : ''}`} data-ru="Главная" data-en="Home">Главная</a>
+        <a href={withBase('3d')} class={`nav-link ${relPath.startsWith('/3d') ? 'active' : ''}`} data-ru="3D / Арт" data-en="3D / Art">3D / Арт</a>
+        <a href={withBase('music')} class={`nav-link ${relPath.startsWith('/music') ? 'active' : ''}`} data-ru="Музыка" data-en="Music">Музыка</a>
+        <a href={withBase('video')} class={`nav-link ${relPath.startsWith('/video') ? 'active' : ''}`} data-ru="Видео" data-en="Video">Видео</a>
+        <a href={withBase('games')} class={`nav-link ${relPath.startsWith('/games') ? 'active' : ''}`} data-ru="Игры" data-en="Games">Игры</a>
+        <a href={withBase('services')} class={`nav-link ${relPath.startsWith('/services') ? 'active' : ''}`} data-ru="Услуги" data-en="Services">Услуги</a>
+        <a href={withBase('about')} class={`nav-link ${relPath.startsWith('/about') ? 'active' : ''}`} data-ru="Обо мне" data-en="About">Обо мне</a>
+      </div>
+
+      <div class="nav-right">
+        <button class="lang-toggle" id="langToggle" onclick="window.toggleLang()" title="Switch language">
+          <span class="lang-ru-label">RU</span>
+          <span class="lang-sep">|</span>
+          <span class="lang-en-label">EN</span>
+        </button>
+
+        <!-- Theme toggle (next to RU|EN) -->
+        <button class="theme-toggle" id="themeToggle" onclick="window.toggleTheme()" title="Theme" aria-label="Toggle theme">
+          <svg class="theme-ic theme-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+          </svg>
+          <svg class="theme-ic theme-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+        </button>
+
+        <button class="burger-btn" id="burgerBtn" onclick="window.toggleMobileNav()" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mobile-nav glass" id="mobileNav">
+      <a href={withBase('')} class={`mobile-nav-link ${relPath === '/' ? 'active' : ''}`} data-ru="Главная" data-en="Home" onclick="closeMobileNav()">Главная</a>
+      <a href={withBase('3d')} class={`mobile-nav-link ${relPath.startsWith('/3d') ? 'active' : ''}`} data-ru="3D / Арт" data-en="3D / Art" onclick="closeMobileNav()">3D / Арт</a>
+      <a href={withBase('music')} class={`mobile-nav-link ${relPath.startsWith('/music') ? 'active' : ''}`} data-ru="Музыка" data-en="Music" onclick="closeMobileNav()">Музыка</a>
+      <a href={withBase('video')} class={`mobile-nav-link ${relPath.startsWith('/video') ? 'active' : ''}`} data-ru="Видео" data-en="Video" onclick="closeMobileNav()">Видео</a>
+      <a href={withBase('games')} class={`mobile-nav-link ${relPath.startsWith('/games') ? 'active' : ''}`} data-ru="Игры" data-en="Games" onclick="closeMobileNav()">Игры</a>
+      <a href={withBase('services')} class={`mobile-nav-link ${relPath.startsWith('/services') ? 'active' : ''}`} data-ru="Услуги" data-en="Services" onclick="closeMobileNav()">Услуги</a>
+      <a href={withBase('about')} class={`mobile-nav-link ${relPath.startsWith('/about') ? 'active' : ''}`} data-ru="Обо мне" data-en="About" onclick="closeMobileNav()">Обо мне</a>
+    </div>
+  </nav>
+
+  <main style="position:relative;z-index:1;">
+    <slot />
+  </main>
+
+  <footer style="position:relative;z-index:1;text-align:center;padding:40px 24px 32px;margin-top:80px;">
+    <div style="font-size:12px;color:var(--text-hint);">
+      © 2026 timteam · <span data-ru="Сделано с ♥ и Blender" data-en="Made with ♥ and Blender">Сделано с ♥ и Blender</span>
+    </div>
+  </footer>
+
+  <!-- Global audio -->
+  <audio id="main-audio" preload="metadata" transition:persist></audio>
+
+  <style>
+    /* Nav */
+    .nav-bar {
+      max-width: 840px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 8px 8px 20px; gap: 8px;
+    }
+    .nav-logo {
+      font-size: 15px; font-weight: 700; color: var(--text-main);
+      text-decoration: none; letter-spacing: .01em;
+      flex-shrink: 0; transition: opacity .15s;
+    }
+    .nav-logo:hover { opacity: .7; }
+    .nav-links {
+      display: flex; align-items: center; gap: 2px; flex: 1; justify-content: center;
+    }
+    .nav-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+    /* Language toggle */
+.lang-toggle {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-vis);
+  border-radius: 100px; padding: 5px 12px;
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  color: var(--text-muted); transition: all .25s;
+}
+
+/* Theme toggle */
+.theme-toggle{
+  display:flex; align-items:center; justify-content:center;
+  width: 34px; height: 30px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-vis);
+  border-radius: 100px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: background .25s, color .25s, transform .25s;
+}
+
+/* Burger */
+.burger-btn {
+  display: none; flex-direction: column; justify-content: space-between;
+  width: 36px; height: 28px; padding: 4px 6px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-vis);
+  border-radius: 10px; cursor: pointer; transition: all .25s;
+}
+    .burger-btn.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .burger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .burger-btn.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    /* Mobile nav */
+    .mobile-nav {
+      max-width: 840px; margin: 8px auto 0;
+      border-radius: 20px; padding: 12px;
+      display: none; flex-direction: column; gap: 4px;
+      animation: fadeDown .3s ease;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav-link {
+      font-size: 15px; color: var(--text-muted); text-decoration: none;
+      padding: 12px 18px; border-radius: 12px;
+      transition: background .25s, color .25s;
+    }
+    .mobile-nav-link:hover, .mobile-nav-link.active {
+      background: rgba(124,58,237,0.1); color: var(--accent);
+    }
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-8px) } to { opacity:1; transform:none } }
+
+    @media (max-width: 720px) {
+      .nav-links { display: none; }
+      .burger-btn { display: flex; }
+    }
+
+    /* Dark theme tweaks for nav buttons */
+    :root.theme-dark .lang-toggle,
+:root.theme-dark .burger-btn,
+:root.theme-dark .theme-toggle{
+  background: rgba(20, 16, 38, 0.45);
+}
+  </style>
+
+  <script is:inline>
+    // ── Language system ─────────────────────────────────────────
+    window._tt_lang = localStorage.getItem('lang') || 'ru';
+
+    function getGlobalAudio() {
+      return window._tt_audio || document.getElementById('main-audio');
+    }
+    window._tt_audio = getGlobalAudio();
+
+    window._tt_nowPlaying = window._tt_nowPlaying || null;
+
+    window._tt_setNowPlaying = function(payload) {
+      window._tt_nowPlaying = payload;
+      document.dispatchEvent(new CustomEvent('nowplayingchange', { detail: payload }));
+    };
+
+    window._tt_getNowPlaying = function() {
+      return window._tt_nowPlaying;
+    };
+
+    function bindGlobalAudioEnded() {
+      const audio = getGlobalAudio();
+      if (!audio || audio.dataset.ttEndedBound === '1') return;
+      audio.dataset.ttEndedBound = '1';
+
+      audio.addEventListener('ended', () => {
+        const h = window._tt_onEnded;
+        if (typeof h === 'function') h();
+        else if (typeof window.mpNext === 'function') window.mpNext();
+      });
+    }
+    bindGlobalAudioEnded();
+    document.addEventListener('astro:page-load', bindGlobalAudioEnded);
+
+    function applyLang(lang) {
+      window._tt_lang = lang;
+      localStorage.setItem('lang', lang);
+      document.body.classList.toggle('lang-ru', lang === 'ru');
+      document.body.classList.toggle('lang-en', lang === 'en');
+      document.querySelectorAll('[data-ru]').forEach(el => {
+        el.textContent = lang === 'en' ? (el.dataset.en || el.dataset.ru) : el.dataset.ru;
+      });
+      document.dispatchEvent(new Event('langchange'));
+    }
+
+    window.toggleLang = function() {
+      applyLang(window._tt_lang === 'ru' ? 'en' : 'ru');
+    };
+
+    // ── Theme system ──────────────────────────────────────────
+    (function () {
+      const KEY = 'theme'; // 'light' | 'dark' | null(system)
+      const mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+
+      function getStored() {
+        try {
+          const v = localStorage.getItem(KEY);
+          return (v === 'light' || v === 'dark') ? v : null;
+        } catch { return null; }
+      }
+
+      function systemTheme() { return mq && mq.matches ? 'dark' : 'light'; }
+      function resolvedTheme() { return getStored() || systemTheme(); }
+
+      function applyTheme(theme) {
+        // html (already set early) + body (for our CSS selectors)
+        document.documentElement.classList.toggle('theme-dark', theme === 'dark');
+        document.documentElement.classList.toggle('theme-light', theme === 'light');
+        document.documentElement.style.colorScheme = theme;
+
+        if (document.body) {
+          document.body.classList.toggle('theme-dark', theme === 'dark');
+          document.body.classList.toggle('theme-light', theme === 'light');
+        }
+
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', theme === 'dark' ? '#0b0716' : '#faf5ff');
+      }
+
+      window.toggleTheme = function () {
+        const cur = resolvedTheme();
+        const next = cur === 'dark' ? 'light' : 'dark';
+        try { localStorage.setItem(KEY, next); } catch {}
+        applyTheme(next);
+      };
+
+      function initTheme() {
+        applyTheme(resolvedTheme());
+
+        // react to system changes only if user didn't override
+        if (!getStored() && mq && mq.addEventListener) {
+          mq.addEventListener('change', () => applyTheme(resolvedTheme()));
+        }
+      }
+
+      initTheme();
+      document.addEventListener('astro:page-load', initTheme);
+      document.addEventListener('astro:after-swap', initTheme);
+    })();
+
+    // Apply on every page load
+    document.addEventListener('astro:page-load', () => {
+      applyLang(window._tt_lang || localStorage.getItem('lang') || 'ru');
+      initAudioBlobs();
+    });
+
+    applyLang(window._tt_lang);
+
+    // ── Mobile nav ──────────────────────────────────────────────
+    window.toggleMobileNav = function() {
+      const nav = document.getElementById('mobileNav');
+      const btn = document.getElementById('burgerBtn');
+      if (!nav || !btn) return;
+      nav.classList.toggle('open');
+      btn.classList.toggle('open');
+    };
+    window.closeMobileNav = function() {
+      const nav = document.getElementById('mobileNav');
+      const btn = document.getElementById('burgerBtn');
+      if (nav) nav.classList.remove('open');
+      if (btn) btn.classList.remove('open');
+    };
+
+    // ── Audio-reactive blobs v4 (your current working code) ──
+    const TT_ORBS = window.__tt_orbs || (window.__tt_orbs = {
+      ctx: null, analyser: null, source: null,
+      freq: null, prevFreq: null, time: null,
+      raf: null, driftRaf: null,
+      bassSm: 0, midSm: 0, highSm: 0,
+      beatSm: 0, rmsSm: 0,
+      drift: [],
+    });
+
+    function ttGetAudio() { return window._tt_audio || document.getElementById('main-audio'); }
+    function ttClamp01(x) { return Math.max(0, Math.min(1, x)); }
+    function ttAvg(arr, from, to) {
+      let sum = 0;
+      const end = Math.min(to, arr.length);
+      const n = Math.max(1, end - from);
+      for (let i = from; i < end; i++) sum += arr[i];
+      return sum / n;
+    }
+    function ttRmsByteTimeDomain(arr) {
+      let sum = 0;
+      for (let i = 0; i < arr.length; i++) {
+        const v = (arr[i] - 128) / 128;
+        sum += v * v;
+      }
+      return Math.sqrt(sum / Math.max(1, arr.length));
+    }
+    function ttSoftSat(x) {
+      x = ttClamp01(x);
+      const k = 2.0;
+      return 1 - Math.exp(-k * x);
+    }
+
+    function ttEnsureWrapped() {
+      const blobs = document.querySelectorAll('.aurora-bg .blob');
+      blobs.forEach((blob, i) => {
+        const p = blob.parentElement;
+        if (p && p.classList.contains('blob-wrap')) return;
+
+        const wrap = document.createElement('div');
+        wrap.className = 'blob-wrap';
+        wrap.dataset.i = String(i);
+        wrap.style.position = 'absolute';
+        wrap.style.pointerEvents = 'none';
+
+        const props = ['top','left','right','bottom','width','height','opacity'];
+        props.forEach((k) => {
+          if (blob.style[k]) {
+            wrap.style[k] = blob.style[k];
+            blob.style[k] = '';
+          }
+        });
+
+        blob.parentNode.insertBefore(wrap, blob);
+        wrap.appendChild(blob);
+
+        blob.style.inset = '0';
+        blob.style.width = '100%';
+        blob.style.height = '100%';
+        blob.style.position = 'absolute';
+
+        TT_ORBS.drift[i] = TT_ORBS.drift[i] || {
+          x: 0, y: 0, tx: 0, ty: 0, next: 0,
+          mag: [70, 60, 80, 65, 55, 75][i % 6],
+          spd: 0.020 + (i % 3) * 0.004,
+          phx: Math.random() * Math.PI * 2,
+          phy: Math.random() * Math.PI * 2,
+        };
+      });
+    }
+
+    function ttTrySetupAnalyser(audio) {
+      if (TT_ORBS.analyser) return true;
+      try {
+        TT_ORBS.ctx = TT_ORBS.ctx || new (window.AudioContext || window.webkitAudioContext)();
+        if (TT_ORBS.ctx.state === 'suspended') TT_ORBS.ctx.resume();
+
+        const an = TT_ORBS.ctx.createAnalyser();
+        an.fftSize = 1024;
+        an.smoothingTimeConstant = 0.78;
+
+        TT_ORBS.analyser = an;
+        TT_ORBS.freq = new Uint8Array(an.frequencyBinCount);
+        TT_ORBS.prevFreq = new Uint8Array(an.frequencyBinCount);
+        TT_ORBS.time = new Uint8Array(an.fftSize);
+
+        TT_ORBS.source = TT_ORBS.source || TT_ORBS.ctx.createMediaElementSource(audio);
+        TT_ORBS.source.connect(an);
+        an.connect(TT_ORBS.ctx.destination);
+
+        return true;
+      } catch (e) {
+        console.warn('[orbs] analyser setup failed:', e);
+        TT_ORBS.analyser = null;
+        return false;
+      }
+    }
+
+    function ttStart() {
+      if (TT_ORBS.raf) return;
+      document.querySelectorAll('.aurora-bg .blob').forEach(b => b.classList.remove('blob-idle'));
+      TT_ORBS.raf = requestAnimationFrame(ttTick);
+    }
+
+    function ttStop() {
+      if (TT_ORBS.raf) cancelAnimationFrame(TT_ORBS.raf);
+      TT_ORBS.raf = null;
+
+      document.querySelectorAll('.aurora-bg .blob').forEach((b) => {
+        b.classList.add('blob-idle');
+        b.style.setProperty('--b-scale', '1');
+        b.style.setProperty('--b-hue', '0deg');
+        b.style.setProperty('--b-blur', '60px');
+        if (!b.style.getPropertyValue('--b-op')) b.style.setProperty('--b-op', '0.45');
+      });
+    }
+
+    function ttTick(t) {
+      TT_ORBS.raf = requestAnimationFrame(ttTick);
+
+      const an = TT_ORBS.analyser;
+      if (!an) return;
+
+      const blobs = document.querySelectorAll('.aurora-bg .blob');
+      if (!blobs.length) return;
+
+      an.getByteFrequencyData(TT_ORBS.freq);
+      an.getByteTimeDomainData(TT_ORBS.time);
+
+      const bass = ttAvg(TT_ORBS.freq, 0, 14) / 255;
+      const mid  = ttAvg(TT_ORBS.freq, 14, 60) / 255;
+      const high = ttAvg(TT_ORBS.freq, 60, 160) / 255;
+
+      TT_ORBS.bassSm += (bass - TT_ORBS.bassSm) * 0.10;
+      TT_ORBS.midSm  += (mid  - TT_ORBS.midSm)  * 0.08;
+      TT_ORBS.highSm += (high - TT_ORBS.highSm) * 0.08;
+
+      const rms = ttRmsByteTimeDomain(TT_ORBS.time);
+      TT_ORBS.rmsSm += (rms - TT_ORBS.rmsSm) * 0.12;
+
+      const prev = TT_ORBS.prevFreq;
+      let fluxBass = 0;
+      let fluxMid = 0;
+
+      for (let i = 0; i < TT_ORBS.freq.length; i++) {
+        const d = TT_ORBS.freq[i] - prev[i];
+        if (d > 0) {
+          if (i < 18) fluxBass += d;
+          else if (i < 80) fluxMid += d;
+        }
+      }
+      TT_ORBS.prevFreq.set(TT_ORBS.freq);
+
+      fluxBass = (fluxBass / (18 * 255));
+      fluxMid  = (fluxMid  / (62 * 255));
+
+      const beatRaw = 1.15 * fluxBass + 0.75 * fluxMid;
+      const beatGated = ttClamp01((beatRaw - 0.015) / 0.22);
+      TT_ORBS.beatSm += (beatGated - TT_ORBS.beatSm) * 0.22;
+
+      const silent = (TT_ORBS.rmsSm < 0.018 && TT_ORBS.beatSm < 0.06);
+      const baseLevel = ttClamp01(0.55 * TT_ORBS.bassSm + 0.35 * TT_ORBS.midSm + 0.10 * TT_ORBS.highSm);
+      const level = silent ? 0 : baseLevel;
+      const breath = ttSoftSat(ttClamp01(0.30 * level + 0.92 * TT_ORBS.beatSm));
+
+      blobs.forEach((blob, i) => {
+        const w = [
+          { amp: 0.18, hue:  12, blur: 64, op: 0.50 },
+          { amp: 0.15, hue: -10, blur: 60, op: 0.48 },
+          { amp: 0.14, hue:  14, blur: 58, op: 0.46 },
+          { amp: 0.13, hue: -12, blur: 62, op: 0.44 },
+          { amp: 0.12, hue:   9, blur: 72, op: 0.28 },
+          { amp: 0.11, hue: -16, blur: 76, op: 0.22 },
+        ][i % 6];
+
+        const tone = ttClamp01(0.65 * TT_ORBS.midSm + 0.35 * TT_ORBS.highSm);
+        const hue = (tone - 0.5) * 2 * w.hue;
+
+        const scale = 1 + breath * w.amp;
+        const blur  = Math.max(28, w.blur - breath * 18);
+        const op    = Math.min(0.78, w.op + breath * 0.18);
+
+        blob.style.setProperty('--b-scale', scale.toFixed(3));
+        blob.style.setProperty('--b-hue', hue.toFixed(1) + 'deg');
+        blob.style.setProperty('--b-blur', blur.toFixed(1) + 'px');
+        blob.style.setProperty('--b-op', op.toFixed(3));
+      });
+    }
+
+    function ttEnsureDrift() {
+      if (TT_ORBS.driftRaf) return;
+
+      const step = (t) => {
+        try {
+          if (!document.querySelector('.aurora-bg .blob-wrap')) ttEnsureWrapped();
+
+          const wraps = document.querySelectorAll('.aurora-bg .blob-wrap');
+          wraps.forEach((wrap) => {
+            const i = Number(wrap.dataset.i || 0);
+            const st = TT_ORBS.drift[i] || (TT_ORBS.drift[i] = { x:0,y:0,tx:0,ty:0,next:0,mag:70,spd:0.02,phx:0,phy:0 });
+
+            if (t > st.next) {
+              st.tx = (Math.random() * 2 - 1) * st.mag;
+              st.ty = (Math.random() * 2 - 1) * st.mag;
+              st.next = t + 2200 + Math.random() * 2600;
+            }
+
+            st.x += (st.tx - st.x) * st.spd;
+            st.y += (st.ty - st.y) * st.spd;
+
+            const sx = Math.sin(t * 0.00018 + st.phx) * (st.mag * 0.18);
+            const sy = Math.cos(t * 0.00016 + st.phy) * (st.mag * 0.18);
+
+            wrap.style.setProperty('--dx', (st.x + sx).toFixed(2) + 'px');
+            wrap.style.setProperty('--dy', (st.y + sy).toFixed(2) + 'px');
+          });
+        } catch (e) {
+          console.warn('[orbs] drift tick error:', e);
+        }
+
+        TT_ORBS.driftRaf = requestAnimationFrame(step);
+      };
+
+      TT_ORBS.driftRaf = requestAnimationFrame(step);
+    }
+
+    function initAudioBlobs() {
+      ttEnsureWrapped();
+      ttEnsureDrift();
+
+      const audio = ttGetAudio();
+      if (!audio) return;
+
+      if (audio.dataset.ttOrbsBound === '1') {
+        if (!audio.paused) { ttTrySetupAnalyser(audio); ttStart(); }
+        else { ttStop(); }
+        return;
+      }
+      audio.dataset.ttOrbsBound = '1';
+
+      audio.addEventListener('play', () => { ttTrySetupAnalyser(audio); ttStart(); });
+      audio.addEventListener('pause', () => ttStop());
+      audio.addEventListener('ended', () => ttStop());
+
+      if (!audio.paused) { ttTrySetupAnalyser(audio); ttStart(); }
+      else { ttStop(); }
+    }
+
+    initAudioBlobs();
+    document.addEventListener('astro:page-load', initAudioBlobs);
+    document.addEventListener('astro:after-swap', initAudioBlobs);
+  </script>
+
+  <!-- MediaSession + global hotkeys (your current block can stay; keep as-is) -->
+  <script is:inline>
+    (function () {
+      if (window.__tt_mediaBound) return;
+      window.__tt_mediaBound = true;
+
+      const KNOWN = new Set(['', 'music', '3d', 'video', 'games', 'services', 'about']);
+      function basePrefix() {
+        const clean = location.pathname.replace(/^\/+|\/+$/g, '');
+        const first = clean.split('/')[0] || '';
+        return KNOWN.has(first) ? '/' : `/${first}/`;
+      }
+      function abs(p) {
+        const BASE = basePrefix();
+        return BASE + String(p).replace(/^\/+/, '');
+      }
+
+      function getAudio() {
+        return window._tt_audio || document.getElementById('main-audio');
+      }
+
+      function isTypingTarget(t) {
+        if (!t) return false;
+        const tag = (t.tagName || '').toLowerCase();
+        return tag === 'input' || tag === 'textarea' || t.isContentEditable;
+      }
+
+      function ttPlay() { const a = getAudio(); if (a) a.play().catch(() => {}); }
+      function ttPause() { const a = getAudio(); if (a) a.pause(); }
+      function ttToggle() { const a = getAudio(); if (!a) return; a.paused ? ttPlay() : ttPause(); }
+
+      function ttNext() {
+        if (location.pathname.includes('/music') && typeof window.musicNext === 'function') window.musicNext();
+        else if (typeof window.mpNext === 'function') window.mpNext();
+      }
+      function ttPrev() {
+        if (location.pathname.includes('/music') && typeof window.musicPrev === 'function') window.musicPrev();
+        else if (typeof window.mpPrev === 'function') window.mpPrev();
+      }
+
+      function seekBy(delta) {
+        const a = getAudio();
+        if (!a || !isFinite(a.duration)) return;
+        a.currentTime = Math.max(0, Math.min(a.duration, (a.currentTime || 0) + delta));
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.defaultPrevented) return;
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        if (isTypingTarget(e.target)) return;
+
+        const k = e.key;
+
+        if (k === ' ' || k === 'Spacebar' || k === 'Space') { e.preventDefault(); ttToggle(); return; }
+        if (k === 'ArrowLeft') { e.preventDefault(); seekBy(e.shiftKey ? -15 : -5); return; }
+        if (k === 'ArrowRight') { e.preventDefault(); seekBy(e.shiftKey ? +15 : +5); return; }
+
+        if (k === 'MediaPlayPause') { e.preventDefault(); ttToggle(); return; }
+        if (k === 'MediaTrackNext') { e.preventDefault(); ttNext(); return; }
+        if (k === 'MediaTrackPrevious') { e.preventDefault(); ttPrev(); return; }
+      });
+
+      function coverFromNowPlaying(np) {
+        if (!np) return null;
+        if (np.cover) return np.cover;
+        if (np.albumFolder) return abs(`covers/${encodeURIComponent(np.albumFolder)}.jpg`);
+        return null;
+      }
+
+      function applyMediaMetadata(np) {
+        if (!('mediaSession' in navigator) || !np) return;
+        const cover = coverFromNowPlaying(np);
+        try {
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: np.title || '—',
+            artist: np.artist || 'timteam',
+            album: np.album || '',
+            artwork: cover ? [
+              { src: cover, sizes: '96x96', type: 'image/jpeg' },
+              { src: cover, sizes: '128x128', type: 'image/jpeg' },
+              { src: cover, sizes: '256x256', type: 'image/jpeg' },
+              { src: cover, sizes: '512x512', type: 'image/jpeg' },
+            ] : [],
+          });
+        } catch {}
+      }
+
+      function applyPlaybackState() {
+        if (!('mediaSession' in navigator)) return;
+        const a = getAudio();
+        if (!a) return;
+        try { navigator.mediaSession.playbackState = a.paused ? 'paused' : 'playing'; } catch {}
+      }
+
+      let posT = 0;
+      function updatePositionState() {
+        if (!('mediaSession' in navigator)) return;
+        const a = getAudio();
+        if (!a || !isFinite(a.duration)) return;
+        if (typeof navigator.mediaSession.setPositionState !== 'function') return;
+
+        const now = performance.now();
+        if (now - posT < 250) return;
+        posT = now;
+
+        try {
+          navigator.mediaSession.setPositionState({
+            duration: a.duration,
+            position: a.currentTime || 0,
+            playbackRate: a.playbackRate || 1,
+          });
+        } catch {}
+      }
+
+      function bindMediaHandlers() {
+        if (!('mediaSession' in navigator)) return;
+        if (window.__tt_mediaHandlersBound) return;
+        window.__tt_mediaHandlersBound = true;
+
+        const ms = navigator.mediaSession;
+        const safeSet = (name, fn) => { try { ms.setActionHandler(name, fn); } catch {} };
+
+        safeSet('play', () => ttPlay());
+        safeSet('pause', () => ttPause());
+        safeSet('previoustrack', () => ttPrev());
+        safeSet('nexttrack', () => ttNext());
+        safeSet('seekbackward', (details) => seekBy(-(details?.seekOffset ?? 5)));
+        safeSet('seekforward', (details) => seekBy(+(details?.seekOffset ?? 5)));
+        safeSet('seekto', (details) => {
+          const a = getAudio();
+          if (!a || !isFinite(a.duration)) return;
+          const t = Math.max(0, Math.min(a.duration, Number(details.seekTime || 0)));
+          if (details.fastSeek && typeof a.fastSeek === 'function') a.fastSeek(t);
+          else a.currentTime = t;
+          updatePositionState();
+        });
+      }
+
+      document.addEventListener('nowplayingchange', (e) => {
+        const np = e?.detail || (typeof window._tt_getNowPlaying === 'function' ? window._tt_getNowPlaying() : window._tt_nowPlaying);
+        applyMediaMetadata(np);
+      });
+
+      function bindAudioToMediaSession() {
+        const a = getAudio();
+        if (!a || a.dataset.ttMediaAudioBound === '1') return;
+        a.dataset.ttMediaAudioBound = '1';
+
+        a.addEventListener('play', () => { applyPlaybackState(); updatePositionState(); });
+        a.addEventListener('pause', () => { applyPlaybackState(); updatePositionState(); });
+        a.addEventListener('timeupdate', () => updatePositionState());
+        a.addEventListener('loadedmetadata', () => updatePositionState());
+        a.addEventListener('ratechange', () => updatePositionState());
+      }
+
+      bindMediaHandlers();
+      bindAudioToMediaSession();
+
+      document.addEventListener('astro:page-load', () => {
+        bindMediaHandlers();
+        bindAudioToMediaSession();
+        applyPlaybackState();
+        const np = (typeof window._tt_getNowPlaying === 'function') ? window._tt_getNowPlaying() : window._tt_nowPlaying;
+        applyMediaMetadata(np);
+      });
+    })();
+  </script>
+
+</body>
+</html>
